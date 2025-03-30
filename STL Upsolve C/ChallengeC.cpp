@@ -56,8 +56,7 @@ struct User
 };
 
 
-
-map<string, Button>a_db;
+map<string, Button>button_db;
 map<string, User>old_user_db;
 map<string, User>new_user_db;
 
@@ -83,9 +82,10 @@ int main(int argc, char** argv)
 	const char* filename = (argc < 2) ? "inputC.txt" : argv[1];
 	ifstream fin(filename);
 
+	//CITIRI
 	int screen_l, screen_c;
 	fin >> screen_l >> screen_c;
-	cout << screen_l << " " << screen_c << "\n";
+
 	int no_buttons;
 	fin >> no_buttons;
 	for (int i = 0; i < no_buttons; i++)
@@ -93,10 +93,9 @@ int main(int argc, char** argv)
 		Button but;
 		fin >> but.id;
 		fin >> but.top_left.x >> but.top_left.y >> but.bottom_right.x >> but.bottom_right.y;
-		a_db.insert(make_pair(but.id, but));
+		button_db.insert(make_pair(but.id, but));
 	}
 
-	//BAZA DE DATE VECHE
 	int no_clicks;
 	fin >> no_clicks;
 	for (int i = 0; i < no_clicks; i++)
@@ -107,7 +106,7 @@ int main(int argc, char** argv)
 		//acum verificam daca a fost apasat vreun buton
 		string pushed_button = "null";
 
-		for (auto& elem : a_db)
+		for (auto& elem : button_db)
 		{
 			if ((elem.second.top_left.x <= x && x <= elem.second.bottom_right.x) &&
 				(elem.second.top_left.y <= y && y <= elem.second.bottom_right.y))
@@ -132,33 +131,10 @@ int main(int argc, char** argv)
 		}
 
 	}
+	
+	//REZOLVARE
 
-
-	//PT B
-	/*
-	cout << "Debug pentru cerinta b:\n";
-	for (auto elem : new_user_db)
-	{
-		cout << elem.first << ": ";
-		for (auto click : elem.second.click)
-		{
-			cout << click.button_clicked << " cu coordonatele " << click.coords.x << ", " << click.coords.y << "\n";
-		}
-		cout << "\n";
-	}
-	*/
-	/*
-	for (auto user : old_user_db)
-	{
-		cout << "Userul " << user.first << " a apasat pe :";
-		for (auto elem : user.second.click)
-		{
-			cout << elem.button_clicked << " ";
-		}
-		cout << "\n";
-	}
-	*/
-
+	//generez mapa de frecvente (cod identic cu cerinta B, dar necesar ca sa creez flowul principal
 	for (auto user : old_user_db)
 	{
 		for (int i = 0; i < user.second.click.size() - 1; i++)
@@ -167,77 +143,35 @@ int main(int argc, char** argv)
 		}
 	}
 
-	/*
-	for (auto elem : most_likely_to_be_pushed)
-	{
-		cout << "pt " << elem.first << " avem:\n";
-		for (auto but : elem.second)
-		{
-			cout << but.first << " de " << but.second << " ori\n";
-		}
-	}
-	*/
-
-	/*
-	for (auto new_user : new_user_db)
-	{
-		cout << new_user.first << ": ";
-
-		string pentru = new_user.second.click[new_user.second.click.size() - 1].button_clicked;
-		string solution = "null";
-
-		//cout << "La mine utilizatorul " << new_user.first << " a apasat ultima oara " << pentru << "\n";
-
-		//pentru butonul pentru.. trebuie sa vad most likely pushed care sa NU fie el insusi
-		set<pair<string, int>, CustomComparator> s;
-		for (auto curr_butt : most_likely_to_be_pushed[pentru])
-		{
-			s.insert({ curr_butt.first,curr_butt.second });
-			//cout << "inserez in set" << curr_butt.first << " " << curr_butt.second;
-			//cout << "\n";
-		}
-
-		/*
-		cout << "afisare set:\n";
-		for (auto elem : s)
-			cout << "{" << elem.first << ", " << elem.second << "}, ";
-		cout << "\n";
-
-
-		pair<string, int> extracted = *(s.begin());
-		cout << extracted.first << "\n";
-		s.clear();
-	}
-	*/
-
 	//CERINTA C
 	vector<string>flow_principal;
 	//ni se da un input
-	//de la acel input general pq-ul (bazat pe mapa de frecventa)
+	//de la acel input generam pq-ul (bazat pe mapa de frecventa)
 	//pentru fiecare posibil raspuns la pasul i din flow_principal
 	//verificam daca a aparut pana acum posibilul raspuns de la pasul 0 pana la pasul i-1 (pt a evita ciclurile)
-	//primul pe care l gasim care nu a aparut deja in flow il bagam, trecem la pasul urmator
+	//primul pe care il gasim care nu a aparut deja in flow il bagam, trecem la pasul urmator
 	//daca trecem prin tot pq ul si nu avem niciun raspuns, inseamna ca acela e finalul flow ului
+
 	string prev_flow_item;
-	fin.ignore();
 	fin >> prev_flow_item;
+
+	//generare flow principal
 	flow_principal.push_back(prev_flow_item);
 	string rasp = "null";
 	do
 	{
 		rasp = "null";
-		cout << "acum caut succesorul lui " << prev_flow_item << "\n";
+
 		set<pair<string, int>, CustomComparator> s;
 		for (auto curr_butt : most_likely_to_be_pushed[prev_flow_item])
 		{
 			s.insert({ curr_butt.first,curr_butt.second });
 		}
 
-
 		while (!s.empty())
 		{
 			pair<string, int> extracted = *(s.begin());
-			//il caut daca e in vectorul meu deja de string
+			//il caut daca e deja in vectorul meu  de string
 			auto it = find(flow_principal.begin(), flow_principal.end(), extracted.first);
 			if (it != flow_principal.end())
 			{
@@ -252,9 +186,7 @@ int main(int argc, char** argv)
 			s.erase(s.begin());
 		}
 
-		s.clear();
-
-		cout << " acum rasp=" << rasp << "\n";
+		s.clear();//in cazul in care nu s a golit deja pq-ul
 
 		if (rasp != "null")
 		{
@@ -263,34 +195,81 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			break;
+			break;//am ajuns la finalul flowului
 		}
+
 	} while (rasp != "null");
 
-	cout << "\n";
+	//afisez elementele flowului principal
 	for (string elem : flow_principal)
 		cout << elem << " ";
 	cout << "\n";
 
-	//merge flowul principal.
-	//pentru fiecare utilizator de de la old user database, afisez momentan ce apasa el
-	for (auto elem : old_user_db)
+	
+	//formez toate subarray-urile posibile din flow_principal care au cel putin 3 elemente
+	//le bag intr un vector de vector
+	vector<vector<string>>sub_flow_principal;
+	int flow_size = flow_principal.size();
+	for (int flow_st = 0; flow_st <= flow_size - 3; flow_st++)
 	{
-		cout << elem.first << " a apasat :";
-		for (auto st : elem.second.click)
-			cout << st.button_clicked << " ";
-		cout << "\n";
+		for (int flow_dr = flow_size - 1; flow_dr >= flow_st + 2; flow_dr--)
+		{
+			vector<string> search_me(flow_principal.begin() + flow_st, flow_principal.begin() + flow_dr + 1);
+			sub_flow_principal.push_back(search_me);
+		}
 	}
 
-	//in afara de user 5 la test 3 imi merg bine toate logurile
 	for (auto elem : old_user_db)
 	{
-		vector<string>searchvect;
+		//pt fiecare user voi crea un vector de string al clickurilor sale
+		// (ei au stocat vector de struct de click)
+		vector<string>user_flow;
 		for (auto st : elem.second.click)
-			searchvect.push_back(st.button_clicked);
+			user_flow.push_back(st.button_clicked);
 
-		//caut flowul meu in searchvect, gasesc cea mai mare secventa
-		//...
+		string username = elem.first;
+		int best_len = -1;
+		int left_sol = -1, right_sol = 0;
+
+		//trecem prin fiecare subsir al flowului principal si il cautam in intregime in user_flow.
+		for (const auto& subarray : sub_flow_principal)
+		{
+			//cautam in user_flow pe subarray
+			auto it = search(user_flow.begin(), user_flow.end(), subarray.begin(), subarray.end());
+
+			if (it != user_flow.end())//am gasit toata secventa subarray in user_flow
+			{
+				int left_pretendent = distance(user_flow.begin(), it);
+				int len = subarray.size();
+				int right_pretendent = left_pretendent + len - 1;
+
+				if (len > best_len) {
+					best_len = len;
+					left_sol = left_pretendent;
+					right_sol = right_pretendent;
+				}
+				else if (len == best_len)
+				{
+					//caz in care am gasit deja o secventa de aceeasi marime
+					//dar cea de acum e mai in stanga
+					if (left_pretendent < left_sol)
+					{
+						best_len = len;
+						left_sol = left_pretendent;
+						right_sol = right_pretendent;
+					}
+				}
+			}
+		}
+	
+		//discutie daca sa afisez
+		if (best_len >= 3)
+		{
+			cout << username << " ";
+			for (auto elem : user_flow)
+				cout << elem << " ";
+			cout << left_sol << " " << right_sol << endl;
+		}
 	}
 
 	return 0;
