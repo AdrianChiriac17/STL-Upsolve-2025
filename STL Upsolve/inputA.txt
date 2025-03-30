@@ -1,0 +1,41 @@
+37 37
+5
+b1 0 0 5 3
+b2 4 4 7 15
+b3 25 13 30 19
+b4 10 32 20 34
+b5 25 32 35 34
+33
+user1 2 1
+user1 8 11
+user3 1 2
+user6 0 34
+user5 0 1
+user1 27 15
+user2 1 1
+user2 4 7
+user3 5 13
+user6 10 2
+user5 7 13
+user4 4 8
+user4 29 18
+user1 4 15
+user3 29 16
+user3 13 32
+user3 27 34
+user6 4 14
+user2 27 10
+user2 27 18
+user6 28 15
+user5 29 19
+user5 32 34
+user4 27 32
+user5 29 18
+user4 10 32
+user1 30 18
+user2 14 34
+user5 27 20
+user2 25 18
+user6 27 33
+user5 32 34
+user6 18 34
